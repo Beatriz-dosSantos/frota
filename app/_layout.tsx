@@ -24,20 +24,26 @@ export default function Layout() {
               <Pressable
                 key={tab.path}
                 onPress={() => router.replace(tab.path as any)}
-                style={[styles.tabItem, isActive && styles.activeTab]}
+                style={[
+                  styles.tabItem,
+                  isActive && styles.activeTab,
+                ]}
               >
                 <MaterialIcons
                   name={tab.icon}
-                  size={24}
-                  color={isActive ? '#007aff' : '#444'}
+                  size={26}
+                  color={isActive ? '#007aff' : '#888'}
+                  style={isActive && styles.activeIcon}
                 />
-                <Text style={{ color: isActive ? '#007aff' : '#444', fontSize: 12 }}>
+                <Text style={[styles.tabText, isActive && styles.activeText]}>
                   {tab.title}
                 </Text>
               </Pressable>
             );
           })}
         </View>
+
+        {/* Conteúdo da rota */}
         <Slot />
       </View>
     </SafeAreaProvider>
@@ -51,17 +57,34 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 8,
-    backgroundColor: '#eee',
+    paddingVertical: 10,
+    backgroundColor: '#f9f9f9',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
   tabItem: {
     alignItems: 'center',
     paddingHorizontal: 8,
+    paddingBottom: 4,
+  },
+  tabText: {
+    fontSize: 12,
+    color: '#444',
+  },
+  activeText: {
+    color: '#007aff',
+    fontWeight: 'bold',
   },
   activeTab: {
     borderBottomWidth: 2,
     borderBottomColor: '#007aff',
+  },
+  activeIcon: {
+    transform: [{ scale: 1.1 }],
   },
 });
