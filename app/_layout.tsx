@@ -1,59 +1,67 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Slot, useRouter, usePathname } from 'expo-router';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
-import { useColorScheme } from '@/components/useColorScheme';
+export default function Layout() {
+  const router = useRouter();
+  const pathname = usePathname();
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  const tabs = [
+    { title: 'Funcionários', path: '/funcionarios', icon: 'people' },
+    { title: 'Veículos', path: '/veiculos', icon: 'directions-car' },
+    { title: 'Reservas', path: '/reservas', icon: 'event' },
+  ] as const;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <View style={styles.container}>
+        {/* Barra de abas no topo */}
+        <View style={styles.tabBar}>
+          {tabs.map((tab) => {
+            const isActive = pathname.startsWith(tab.path);
+            return (
+              <Pressable
+                key={tab.path}
+                onPress={() => router.replace(tab.path as any)}
+                style={[styles.tabItem, isActive && styles.activeTab]}
+              >
+                <MaterialIcons
+                  name={tab.icon}
+                  size={24}
+                  color={isActive ? '#007aff' : '#444'}
+                />
+                <Text style={{ color: isActive ? '#007aff' : '#444', fontSize: 12 }}>
+                  {tab.title}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <Slot />
+      </View>
+    </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 8,
+    backgroundColor: '#eee',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  tabItem: {
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#007aff',
+  },
+});
