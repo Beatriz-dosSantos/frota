@@ -1,8 +1,3 @@
-Claro! Aqui está um `README.md` explicando tudo que deve ser instalado no PowerShell do VS Code para que seu projeto React Native com Firebase funcione corretamente com o Expo Router:
-
----
-
-````markdown
 # Gestor de Frota — Configuração e Instalação
 
 Este guia mostra como configurar o ambiente no PowerShell do VS Code para rodar o projeto Gestor de Frota, feito com React Native, Firebase e Expo Router.
