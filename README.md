@@ -15,12 +15,10 @@ Antes de tudo, você precisa ter instalado:
      node -v
      ```
 
----
-
 2. **Expo CLI**
    ```powershell
    npm install -g expo-cli
-````
+   ```
 
 ---
 
