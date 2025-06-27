@@ -9,8 +9,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 
 export default function Login() {
@@ -28,28 +28,32 @@ export default function Login() {
 
     try {
       setLoading(true);
+
+      // Autentica o usuário
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
       const uid = userCredential.user.uid;
 
+      // Busca o perfil no Firestore
       const docRef = doc(db, 'funcionarios', uid);
       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const role = data?.role;
+      if (!docSnap.exists()) {
+        Alert.alert('Erro', 'Usuário não cadastrado na base de dados');
+        return;
+      }
 
-        if (role === 'admin') {
-          router.replace('/dashboard-admin');
-        } else if (role === 'funcionario') {
-          router.replace('/dashboard-funcionario');
-        } else {
-          Alert.alert('Erro', 'Perfil de usuário inválido');
-        }
+      const data = docSnap.data();
+      const role = data?.role;
+
+      if (role === 'admin') {
+        router.replace('/dashboard-admin');
+      } else if (role === 'funcionario') {
+        router.replace('/dashboard-funcionario');
       } else {
-        Alert.alert('Erro', 'Usuário não encontrado no Firestore');
+        Alert.alert('Erro', 'Perfil de usuário inválido');
       }
     } catch (error: any) {
-      Alert.alert('Erro', error.message || 'Falha ao fazer login');
+      Alert.alert('Erro ao fazer login', error.message);
     } finally {
       setLoading(false);
     }
@@ -67,6 +71,7 @@ export default function Login() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Senha"
