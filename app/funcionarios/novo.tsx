@@ -1,50 +1,142 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { adicionarFuncionario } from '@/services/funcionarios';
-
-const router = useRouter();
-
-<Button title="Voltar" onPress={() => router.back()} />;
+import { registerFuncionario } from '@/services/registerFuncionario';
 
 export default function NovoFuncionario() {
-  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [nomeCompleto, setNomeCompleto] = useState('');
   const [telefone, setTelefone] = useState('');
   const [cnh, setCnh] = useState('');
-  const [login, setLogin] = useState('');
+  const [role, setRole] = useState<'admin' | 'funcionario'>('funcionario');
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
 
-  const handleSalvar = async () => {
-    if (!nome || !telefone || !cnh || !login) {
-      Alert.alert('Erro', 'Preencha todos os campos');
+  const handleCadastrar = async () => {
+    if (!email || !senha || !nomeCompleto || !telefone || !cnh) {
+      Alert.alert('Erro', 'Preencha todos os campos!');
       return;
     }
 
-    await adicionarFuncionario({
-      nomeCompleto: nome,
-      telefone,
-      cnh,
-      login,
-      autorizado: true,
-    });
-    Alert.alert('Sucesso', 'Funcionário cadastrado');
-    router.replace('/funcionarios');
+    try {
+      setLoading(true);
+      await registerFuncionario(email, senha, {
+        nomeCompleto,
+        telefone,
+        cnh,
+        role,
+      });
+      Alert.alert('Sucesso', 'Funcionário cadastrado!');
+      router.replace('/funcionarios');
+    } catch (error: any) {
+      Alert.alert('Erro', error.message || 'Erro ao cadastrar');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.titulo}>Novo Funcionário</Text>
-      <TextInput placeholder="Nome completo" value={nome} onChangeText={setNome} style={styles.input} />
-      <TextInput placeholder="Telefone" value={telefone} onChangeText={setTelefone} style={styles.input} />
-      <TextInput placeholder="CNH" value={cnh} onChangeText={setCnh} style={styles.input} />
-      <TextInput placeholder="Login (email)" value={login} onChangeText={setLogin} style={styles.input} />
-      <Button title="Salvar" onPress={handleSalvar} />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Cadastro de Funcionário</Text>
+
+      <TextInput
+        placeholder="Email"
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TextInput
+        placeholder="Senha"
+        style={styles.input}
+        value={senha}
+        onChangeText={setSenha}
+        secureTextEntry
+      />
+      <TextInput
+        placeholder="Nome Completo"
+        style={styles.input}
+        value={nomeCompleto}
+        onChangeText={setNomeCompleto}
+      />
+      <TextInput
+        placeholder="Telefone"
+        style={styles.input}
+        value={telefone}
+        onChangeText={setTelefone}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        placeholder="CNH"
+        style={styles.input}
+        value={cnh}
+        onChangeText={setCnh}
+        keyboardType="numeric"
+      />
+
+      {/* Simples seletor de tipo de usuário (substitua por Picker se quiser) */}
+      <View style={styles.roleContainer}>
+        <Button
+          title="Funcionário"
+          color={role === 'funcionario' ? '#007bff' : '#ccc'}
+          onPress={() => setRole('funcionario')}
+        />
+        <Button
+          title="Administrador"
+          color={role === 'admin' ? '#007bff' : '#ccc'}
+          onPress={() => setRole('admin')}
+        />
+      </View>
+
+      <View style={styles.buttonWrapper}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#007bff" />
+        ) : (
+          <Button title="Cadastrar" onPress={handleCadastrar} color="#007bff" />
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  titulo: { fontSize: 20, marginBottom: 16 },
-  input: { borderWidth: 1, borderColor: '#ccc', marginBottom: 10, padding: 10 },
+  container: {
+    padding: 20,
+    backgroundColor: '#fff',
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 6,
+    marginBottom: 15,
+  },
+  roleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
+  },
+  buttonWrapper: {
+    marginTop: 20,
+  },
 });
