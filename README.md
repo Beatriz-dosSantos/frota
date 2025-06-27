@@ -5,7 +5,7 @@ Claro! Aqui está um `README.md` explicando tudo que deve ser instalado no Power
 ````markdown
 # Gestor de Frota — Configuração e Instalação
 
-Este guia mostra como configurar o ambiente no **PowerShell do VS Code** para rodar o projeto **Gestor de Frota**, feito com React Native, Firebase e Expo Router.
+Este guia mostra como configurar o ambiente no PowerShell do VS Code para rodar o projeto Gestor de Frota, feito com React Native, Firebase e Expo Router.
 
 ---
 
@@ -19,6 +19,8 @@ Antes de tudo, você precisa ter instalado:
      ```powershell
      node -v
      ```
+
+---
 
 2. **Expo CLI**
    ```powershell
